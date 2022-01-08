@@ -53,13 +53,16 @@ func (bot *DecisionBot) ListenAndDecide() {
 			// Extract the command from the Message.
 			switch update.Message.Command() {
 			case "start":
-				bot.SendTextMessage(chatId, "Type /decide to begin a decision.")
+				bot.SendTextMessage(chatId, "Type /yesno to begin a yes or no decision.")
+				bot.SendTextMessage(chatId, "Type /decide to begin a multiple choice decision.")
 			case "decide":
 				if bot.HasActiveDecision(chatId) {
 					go bot.StopDecision(chatId)
 				} else {
 					go bot.StartDecision(chatId)
 				}
+			case "yesno":
+				go bot.DecideYesOrNo(chatId)
 			default:
 				bot.SendTextMessage(chatId, "I don't know that command")
 			}
