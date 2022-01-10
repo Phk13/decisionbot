@@ -39,6 +39,24 @@ func (b *DecisionBot) SendTextMessage(chatId int64, msg string) {
 	b.API.Send(tgbotapi.NewMessage(chatId, msg))
 }
 
+func (b *DecisionBot) SendCommandKeyboard(chatId int64, msg string) {
+	var commandKeyboard = tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("/decide"),
+			tgbotapi.NewKeyboardButton("/yesno"),
+		),
+	)
+	reply := tgbotapi.NewMessage(chatId, msg)
+	reply.ReplyMarkup = commandKeyboard
+	b.API.Send(reply)
+}
+
+func (b *DecisionBot) RemoveCommandKeyboard(chatId int64, msg string) {
+	reply := tgbotapi.NewMessage(chatId, msg)
+	reply.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+	b.API.Send(reply)
+}
+
 func (b *DecisionBot) HasActiveDecision(chatId int64) bool {
 	_, ok := b.ActiveDecisions[chatId]
 	return ok

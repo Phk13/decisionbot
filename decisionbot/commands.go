@@ -10,7 +10,7 @@ import (
 func (bot *DecisionBot) StartDecision(chatId int64) {
 	bot.ActiveDecisions[chatId] = &Decision{Lock: sync.Mutex{}}
 	log.Printf("Starting decision for %d\n", chatId)
-	bot.SendTextMessage(chatId, "OK, let me know the choices to decide.")
+	bot.SendTextMessage(chatId, "OK, let me know the choices to decide. \nWrite each choice in a separate message.")
 }
 
 /* StopDecision executes a random selection on all input choices for chatId and finishes the active decision */
@@ -21,7 +21,10 @@ func (bot *DecisionBot) StopDecision(chatId int64) {
 	choice := bot.ActiveDecisions[chatId].Decide()
 	log.Printf("Decision for %d: %s\n", chatId, choice)
 
-	bot.SendTextMessage(chatId, fmt.Sprintf("Alright, out of the %d choices, you should decide %s", decision.ChoiceNumber(), choice))
+	if decision.ChoiceNumber() > 0 {
+		choice = fmt.Sprintf("Alright, out of the %d choices, you should decide %s", decision.ChoiceNumber(), choice)
+	}
+	bot.SendTextMessage(chatId, choice)
 	log.Printf("Finishing decision for %d\n", chatId)
 
 	decision.Lock.Unlock()
@@ -55,6 +58,7 @@ func (bot *DecisionBot) ListenAndDecide() {
 			case "start":
 				bot.SendTextMessage(chatId, "Type /yesno to begin a yes or no decision.")
 				bot.SendTextMessage(chatId, "Type /decide to begin a multiple choice decision.")
+				bot.SendCommandKeyboard(chatId, "I've opened a keyboard with the commands. \nType /closekeyboard if you ever want to close it.")
 			case "decide":
 				if bot.HasActiveDecision(chatId) {
 					go bot.StopDecision(chatId)
@@ -63,6 +67,8 @@ func (bot *DecisionBot) ListenAndDecide() {
 				}
 			case "yesno":
 				go bot.DecideYesOrNo(chatId)
+			case "closekeyboard":
+				bot.RemoveCommandKeyboard(chatId, "Alright, keyboard removed. Type /start to open it again.")
 			default:
 				bot.SendTextMessage(chatId, "I don't know that command")
 			}
