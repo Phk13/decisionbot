@@ -1,9 +1,8 @@
 package decisionbot
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"sync"
-	"time"
 )
 
 type Decision struct {
@@ -21,8 +20,7 @@ func (d *Decision) Decide() string {
 	if len(d.Choices) == 0 {
 		return "You should let me know the choices before asking me to decide..."
 	}
-	rand.Seed(time.Now().Unix())
-	return d.Choices[rand.Intn(len(d.Choices))]
+	return d.Choices[rand.IntN(len(d.Choices))]
 }
 
 func (d *Decision) ChoiceNumber() int {

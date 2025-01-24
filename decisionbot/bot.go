@@ -3,8 +3,7 @@ package decisionbot
 import (
 	"errors"
 	"log"
-	"math/rand"
-	"time"
+	"math/rand/v2"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -15,24 +14,24 @@ type DecisionBot struct {
 	ActiveDecisions map[int64]*Decision
 }
 
-func (b *DecisionBot) NewDecisionBot(token string) error {
+func NewDecisionBot(token string) (*DecisionBot, error) {
+	b := &DecisionBot{}
 	if token == "" {
-		return errors.New("no telegram token found")
+		return nil, errors.New("no telegram token found")
 	}
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	b.API = bot
 	b.API.Debug = true
 	log.Printf("Authorized on account %s\n", b.API.Self.UserName)
-	rand.Seed(time.Now().Unix())
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	b.Updates = bot.GetUpdatesChan(u)
 	b.ActiveDecisions = make(map[int64]*Decision)
 	log.Println("Opened updates channel successfully")
-	return nil
+	return b, nil
 }
 
 func (b *DecisionBot) SendTextMessage(chatId int64, msg string) {
@@ -63,7 +62,7 @@ func (b *DecisionBot) HasActiveDecision(chatId int64) bool {
 }
 
 func (b *DecisionBot) DecideYesOrNo(chatId int64) {
-	decision := rand.Intn(2)
+	decision := rand.IntN(2)
 	if decision == 1 {
 		b.SendTextMessage(chatId, "Yes")
 	} else {

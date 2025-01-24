@@ -11,8 +11,7 @@ func main() {
 	log.Println("Starting decision bot...")
 	log.Println("Fetching API token...")
 
-	dbot := decisionbot.DecisionBot{}
-	err := dbot.NewDecisionBot(os.Getenv("TELEGRAM_APITOKEN"))
+	dbot, err := decisionbot.NewDecisionBot(os.Getenv("TELEGRAM_APITOKEN"))
 	if err != nil {
 		log.Fatal(err)
 	}
