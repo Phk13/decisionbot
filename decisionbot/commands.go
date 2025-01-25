@@ -66,6 +66,7 @@ func (bot *DecisionBot) ListenAndDecide() {
 				} else {
 					go bot.StartDecision(chatId)
 				}
+				continue
 			}
 			if bot.HasActiveDecision(chatId) {
 				go bot.AddChoice(chatId, update.Message.Text)
